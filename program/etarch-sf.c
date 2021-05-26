@@ -68,10 +68,11 @@ unsigned int hex2int(char hex[]) {
 
 
 int main(int argc, char *argv[]) {
-//        ssize_t numbytes;
-//	uint8_t buf[MAXCHAR];
+
     (void) argc;
     char iface[MAXCHAR], et[MAXCHAR], crc[MAXCHAR];
+
+    // Open configuration file and get variables
     FILE *fp;
     char filename[] = "/etc/etarch/etarch.conf";
 
@@ -81,6 +82,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    // Construct and execute command workspace start
     char wsname[MAXCHAR];
     strcat(wsname, "etarch-ws start ");
     strcat(wsname, argv[1]);
@@ -90,10 +92,12 @@ int main(int argc, char *argv[]) {
 
         char ws[MAXCHAR];
         strcpy(ws, argv[1]);
+
+        // INIT construct command conversion
         char exec1[] = "/usr/local/bin/etarch-cv ";
         strcat(exec1, ws);
 
-// INIT convert et
+        // INIT convert et
         FILE *fp1;
 
         if ((fp1 = popen(exec1, "r")) == NULL) {
@@ -103,15 +107,15 @@ int main(int argc, char *argv[]) {
 
         while (fgets(crc, MAXCHAR, fp1) != NULL) {
             // Do whatever you want here...
-//        printf("%.2s", crc);
         }
 
         if (pclose(fp1)) {
             printf("Command not found or exited with error status\n");
             return -1;
         }
-//END convert et
+        //END convert et
 
+        // CONTINUE construct command conversion
         char m0[20], m1[3], m2[3], m3[3], m4[3], m5[3];
         sprintf(m0, "%.2s", &crc[0]);
         sprintf(m1, "%.2s", &crc[2]);
@@ -142,12 +146,12 @@ int main(int argc, char *argv[]) {
         int tx_len;
         char *sendbuf = malloc(MAXALLOC);
 
-/* Header structures */
+        //RAW Socket send component
+        /* Header structures */
         struct ether_header *eh = (struct ether_header *) sendbuf;
-//	struct iphdr *iph = (struct iphdr *) (sendbuf + sizeof(struct ether_header));
-//	struct udphdr *udph = (struct udphdr *) (buf + sizeof(struct iphdr) + sizeof(struct ether_header));
+        //	struct iphdr *iph = (struct iphdr *) (sendbuf + sizeof(struct ether_header));
+        //	struct udphdr *udph = (struct udphdr *) (buf + sizeof(struct iphdr) + sizeof(struct ether_header));
         struct sockaddr_ll socket_address;
-
 
         /* Open RAW socket to send on */
         if ((sockfd = socket(AF_PACKET, SOCK_RAW, IPPROTO_RAW)) == -1) {
@@ -169,12 +173,8 @@ int main(int argc, char *argv[]) {
         /* Bind to device */
         if (setsockopt(sockfd2, SOL_SOCKET, SO_BINDTODEVICE, argv[1], IFNAMSIZ - 1) == -1) {
             perror("SO_BINDTODEVICE");
-            //close(sockfd2);
             exit(EXIT_FAILURE);
         }
-
-
-
 
         /* Get the index of the interface to send on */
         memset(&if_idx, 0, sizeof(struct ifreq));
@@ -187,9 +187,8 @@ int main(int argc, char *argv[]) {
         if (ioctl(sockfd, SIOCGIFHWADDR, &if_mac) < 0)
             perror("SIOCGIFHWADDR");
 
-//	while(1) {
         char *message = malloc(MAXALLOC);
-        // Arquivo - Begin
+        // INIT - file
         char *sndbuf;
         FILE *fp2;
         size_t size;
@@ -198,35 +197,27 @@ int main(int argc, char *argv[]) {
         strcpy(openfile, argv[2]);
         fp2 = fopen(openfile, "rb");
 
-// Vai p/ final do arquivo
+        // Go to end file
         fseek(fp2, 0, SEEK_END);
-        // Pega o tamanho do arquivo
+        // Get size file
         size = ftell(fp2);
-        // Volta p/ inicio do arquivo
+        // Go to back start file
         rewind(fp2);
-        // Aloca espaço no buffer com o tamanho do arquivo
+        // Allocate buffer space with file size
         sndbuf = malloc((size + 1) * sizeof(*sndbuf));
-        // le o arquivo até o fim
+        // Read start to end file
         fread(sndbuf, size, 1, fp2);
         sndbuf[size] = '\0';
-        // Passa o conteudo do arquivo/buffer para variavel global dadosArquivo
+        // Copy file content/buffer to global variable
         strcpy(message, sndbuf);
-        // Arquivo - End
+        // END - file
 
-//	//	int fd = 0;
-//    	printf("Send a message: ");
-//	printf("\n");	
-//    	fgets(message, 100, stdin);
-        //send(fd, message, strlen(message), 0);
-//
         unsigned int i = 0;
         unsigned int j = 0;
-//
+
         while (i < strlen(message)) {
-            //	i=j;
 
             /* Construct the Ethernet header */
-//	memset(sendbuf, 0, MAXALLOC);
             tx_len = 0;
             /* Ethernet header */
             eh->ether_shost[0] = ((uint8_t *) &if_mac.ifr_hwaddr.sa_data)[0];
@@ -242,17 +233,8 @@ int main(int argc, char *argv[]) {
             eh->ether_dhost[4] = m4a;
             eh->ether_dhost[5] = m5a;
             /* Ethertype field */
-//	eh->ether_type = htons(ETH_P_IP);
             eh->ether_type = htons(ETHER_TYPE);
             tx_len += sizeof(struct ether_header);
-
-            /* Packet data */
-//	sendbuf[tx_len++] = 0x62;
-//	sendbuf[tx_len++] = 0x61;
-//	sendbuf[tx_len++] = 0x74;
-//	sendbuf[tx_len++] = 0x61;
-//	sendbuf[tx_len++] = 0x74;
-//	sendbuf[tx_len++] = 0x61;
 
             /* Index of the network device */
             socket_address.sll_ifindex = if_idx.ifr_ifindex;
@@ -268,7 +250,6 @@ int main(int argc, char *argv[]) {
 
             while (j < i + 130 && j < strlen(message)) {
                 sendbuf[tx_len++] = message[j];
-                //printf("%i de %i\n",i,j);
                 j++;
             }
             if (sendto(sockfd, sendbuf, tx_len, 0, (struct sockaddr *) &socket_address, sizeof(struct sockaddr_ll)) < 0)
@@ -282,4 +263,3 @@ int main(int argc, char *argv[]) {
     }
     return 0;
 }
-

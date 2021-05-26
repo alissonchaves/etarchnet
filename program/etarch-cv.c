@@ -67,7 +67,6 @@ int main(int argc, char *argv[]) {
     uint16_t low_byte;
     uint16_t high_byte;
 
-
     if (argc > 1) {
         ptr = (unsigned char *) argv[1];
         while (*ptr && *ptr != '\r' && *ptr != '\n') ptr++;
@@ -82,7 +81,6 @@ int main(int argc, char *argv[]) {
         crc_ccitt_1d0f_val = 0x1d0f;
         crc_kermit_val = 0x0000;
         crc_32_val = 0xffffffffL;
-
 
         prev_byte = 0;
         ptr = (unsigned char *) argv[1];
@@ -103,7 +101,6 @@ int main(int argc, char *argv[]) {
             ptr++;
         }
 
-
         crc_32_val ^= 0xffffffffL;
 
         crc_dnp_val = ~crc_dnp_val;
@@ -119,8 +116,6 @@ int main(int argc, char *argv[]) {
         high_byte = (crc_kermit_val & 0x00ff) << 8;
         crc_kermit_val = low_byte | high_byte;
 
-//		printf( "%s0x08", crc_32_val     );
-//                printf( "%08" PRIX32 "%04" PRIX16, crc_32_val, crc_16_val     );
         char crca[3] = "E0";
         char crcb[20];
         char crc32[20];
@@ -132,10 +127,6 @@ int main(int argc, char *argv[]) {
         strcat(crca, crc16);
 
         printf("%s", crca);
-//
-
     }
-
-//	return 0;
 
 }  /* main (tstcrc.c) */

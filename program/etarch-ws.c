@@ -7,6 +7,8 @@
 int main(int argc, char *argv[]) {
     (void) argc;
     char iface[MAXCHAR], et[MAXCHAR], crc[MAXCHAR];
+
+    // Open configuration file and get variables
     FILE *fp;
     char filename[] = "/etc/etarch/etarch.conf";
 
@@ -16,14 +18,14 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    // INIT construct command conversion
     while ((fscanf(fp, "%s %s", iface, et)) == 2) {
         char exec1[] = "/usr/local/bin/etarch-cv ";
         strcat(exec1, et);
-        //char plus[1] = "+";
         strcat(exec1, "+");
         strcat(exec1, argv[2]);
 
-// INIT convert et
+        // INIT convert et
         FILE *fp1;
         if ((fp1 = popen(exec1, "r")) == NULL) {
             printf("Error opening pipe!\n");
@@ -32,14 +34,15 @@ int main(int argc, char *argv[]) {
 
         while (fgets(crc, MAXCHAR, fp1) != NULL) {
             // Do whatever you want here...
-//        printf("%.2s", crc);
         }
 
         if (pclose(fp1)) {
             printf("Command not found or exited with error status\n");
             return -1;
         }
-//END convert et
+        //END convert et
+
+        // Construct and execute command vNIC creator
         char t0[MAXCHAR] = "/bin/ip link ";
         char T0[MAXCHAR] = "/bin/ip link set ";
 

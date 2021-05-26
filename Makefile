@@ -1,61 +1,3 @@
-#
-# Library: libcrc
-# File:    Makefile
-# Author:  Lammert Bies
-#
-# This file is licensed under the MIT License as stated below
-#
-# Copyright (c) 1999-2019 Lammert Bies
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
-#
-# Description
-# -----------
-# This Makefile is used to build the libcrc library. The only action you should
-# normally have to do is to run the make program from the command line,
-# independent on the Operating System you are working on.
-#
-# This Makefile is manually maintained. No autoconf or automake involved. This
-# was a deliberate decision due to the absense of these tools on some systems,
-# in particular in Windows environments.
-#
-# Dependencies
-# ------------
-# This Makefile is known to be functional with GNU Make. Other make utilities
-# may work or may have problems. GNU Make is available both in source code
-# and precompiled binaries for a large number of environments and therefore
-# you are recommended to install a version of GNU Make if you encounter
-# problems with the default make utility in your development chain.
-#
-# Aside from GNU Make and the standard C compiler headers and libraries which
-# should have been installed already together with your compiler there are no
-# other known dependencies.
-#
-# Library Type
-# ------------
-# The generated library is a library useable for static linking in this
-# source directory structure. The decision for a static linkable library
-# was deliberate because of the relatively small size of the library and the
-# routines and to avoid version and dependency issues when distributing the
-# end application to different environments.
-#
-
 ifeq ($(OS),Windows_NT)
 
 BINDIR = bin\\
@@ -136,12 +78,6 @@ ${GENDIR}${OBJDIR}%${OBJEXT} : ${GENDIR}%.c
 ${EXADIR}${OBJDIR}%${OBJEXT} : ${EXADIR}%.c
 	${CC} -c ${CFLAGS} ${OFLAG}$@ $<
 
-
-# The make file is used to compile the library, a test program to verify the
-# functionality of the checksum algorithms after compilation and example
-# programs.
-#
-
 all:							\
 	${LIBDIR}libcrc${LIBEXT}			\
 	etarch-cv${EXEEXT}				\
@@ -149,12 +85,6 @@ all:							\
 	etarch-ws${EXEEXT}				\
 	etarch-chat${EXEEXT}				\
 	etarch-sf${EXEEXT}				
-#	testall${EXEEXT}				\
-	tstcrc${EXEEXT}
-
-#
-# This target cleans up all files created in the compilation phase.
-#
 
 install:
 	${MKDIR} /etc/etarch
@@ -186,35 +116,11 @@ clean:
 	${RM} ${GENDIR}${OBJDIR}*${OBJEXT}
 	${RM} ${LIBDIR}libcrc${LIBEXT}
 	${RM} ${BINDIR}prc${EXEEXT}
-#	${RM} testall${EXEEXT}
 	${RM} etarch-cv${EXEEXT}
 	${RM} etarch-int${EXEEXT}
 	${RM} etarch-ws${EXEEXT}
 	${RM} etarch-chat${EXEEXT}
 	${RM} etarch-sf${EXEEXT}
-
-#
-# The testall program can be run after compilation to verify the checksum
-# routines. The extension of the program depends on the operating system used.
-#
-
-#testall${EXEEXT} :					\
-		${TSTDIR}${OBJDIR}testall${OBJEXT}	\
-		${TSTDIR}${OBJDIR}testcrc${OBJEXT}	\
-		${TSTDIR}${OBJDIR}testnmea${OBJEXT}	\
-		${LIBDIR}libcrc${LIBEXT}		\
-		Makefile
-#	${LINK} ${XFLAG}testall${EXEEXT}		\
-		${TSTDIR}${OBJDIR}testall${OBJEXT}	\
-		${TSTDIR}${OBJDIR}testcrc${OBJEXT}	\
-		${TSTDIR}${OBJDIR}testnmea${OBJEXT}	\
-		${LIBDIR}libcrc${LIBEXT}
-#	${STRIP} testall${EXEEXT}
-
-#
-# The prc program is used during compilation to generate the lookup tables
-# for the CRC calculation routines.
-#
 
 ${BINDIR}prc${EXEEXT} :					\
 		${GENDIR}${OBJDIR}precalc${OBJEXT}	\
@@ -339,8 +245,6 @@ ${EXADIR}${OBJDIR}etarch-chat${OBJEXT}	: ${EXADIR}etarch-chat.c
 
 ${EXADIR}${OBJDIR}etarch-sf${OBJEXT}	: ${EXADIR}etarch-sf.c 
 
-#${TSTDIR}${OBJDIR}testall${OBJEXT}	: ${TSTDIR}testall.c ${TSTDIR}testall.h
-
 ${TSTDIR}${OBJDIR}testcrc${OBJEXT}	: ${TSTDIR}testcrc.c ${TSTDIR}testall.h ${INCDIR}checksum.h
 
 ${TSTDIR}${OBJDIR}testnmea${OBJEXT}	: ${TSTDIR}testnmea.c ${TSTDIR}testall.h ${INCDIR}checksum.h
@@ -350,4 +254,3 @@ ${GENDIR}${OBJDIR}crc32_table${OBJEXT}	: ${GENDIR}crc32_table.c ${GENDIR}precalc
 ${GENDIR}${OBJDIR}crc64_table${OBJEXT}	: ${GENDIR}crc64_table.c ${GENDIR}precalc.h ${INCDIR}checksum.h
 
 ${GENDIR}${OBJDIR}precalc${OBJEXT}	: ${GENDIR}precalc.c ${GENDIR}precalc.h
-

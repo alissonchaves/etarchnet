@@ -62,7 +62,6 @@ unsigned int hex2int(char hex[]) {
     unsigned int x;
     x = (getNum(hex[0])) * 16 + (getNum(hex[1]));
     return x;
-//    printf("%s", x);
 }
 
 
@@ -71,6 +70,8 @@ int main(int argc, char *argv[]) {
     uint8_t buf[MAXCHAR];
     (void) argc;
     char iface[MAXCHAR], et[MAXCHAR], crc[MAXCHAR];
+
+    // Open configuration file and get variables
     FILE *fp;
     char filename[] = "/etc/etarch/etarch.conf";
 
@@ -80,6 +81,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    // Construct and execute command workspace start
     char wsname[MAXCHAR];
     strcat(wsname, "etarch-ws start ");
     strcat(wsname, argv[1]);
@@ -87,12 +89,13 @@ int main(int argc, char *argv[]) {
 
     while ((fscanf(fp, "%s %s", iface, et)) == 2) {
 
+        // INIT construct command conversion
         char ws[MAXCHAR];
         strcpy(ws, argv[1]);
         char exec1[] = "/usr/local/bin/etarch-cv ";
         strcat(exec1, ws);
 
-// INIT convert et
+        // INIT convert et
         FILE *fp1;
 
         if ((fp1 = popen(exec1, "r")) == NULL) {
@@ -102,15 +105,15 @@ int main(int argc, char *argv[]) {
 
         while (fgets(crc, MAXCHAR, fp1) != NULL) {
             // Do whatever you want here...
-//        printf("%.2s", crc);
         }
 
         if (pclose(fp1)) {
             printf("Command not found or exited with error status\n");
             return -1;
         }
-//END convert et
+        //END convert et
 
+        // CONTINUE construct command conversion
         char m0[20], m1[3], m2[3], m3[3], m4[3], m5[3];
         sprintf(m0, "%.2s", &crc[0]);
         sprintf(m1, "%.2s", &crc[2]);
@@ -141,10 +144,11 @@ int main(int argc, char *argv[]) {
         int tx_len;
         char sendbuf[MAXCHAR];
 
-/* Header structures */
+        //RAW Socket send component
+        /* Header structures */
         struct ether_header *eh = (struct ether_header *) sendbuf;
-//	struct iphdr *iph = (struct iphdr *) (sendbuf + sizeof(struct ether_header));
-//	struct udphdr *udph = (struct udphdr *) (buf + sizeof(struct iphdr) + sizeof(struct ether_header));
+        //	struct iphdr *iph = (struct iphdr *) (sendbuf + sizeof(struct ether_header));
+        //	struct udphdr *udph = (struct udphdr *) (buf + sizeof(struct iphdr) + sizeof(struct ether_header));
         struct sockaddr_ll socket_address;
 
 
@@ -162,18 +166,13 @@ int main(int argc, char *argv[]) {
         /* Allow the socket to be reused - incase connection is closed prematurely */
         if (setsockopt(sockfd2, SOL_SOCKET, SO_REUSEADDR, &sockopt, sizeof sockopt) == -1) {
             perror("setsockopt");
-            //close(sockfd2);
             exit(EXIT_FAILURE);
         }
         /* Bind to device */
         if (setsockopt(sockfd2, SOL_SOCKET, SO_BINDTODEVICE, argv[1], IFNAMSIZ - 1) == -1) {
             perror("SO_BINDTODEVICE");
-            //close(sockfd2);
             exit(EXIT_FAILURE);
         }
-
-
-
 
         /* Get the index of the interface to send on */
         memset(&if_idx, 0, sizeof(struct ifreq));
@@ -205,17 +204,8 @@ int main(int argc, char *argv[]) {
             eh->ether_dhost[4] = m4a;
             eh->ether_dhost[5] = m5a;
             /* Ethertype field */
-//	eh->ether_type = htons(ETH_P_IP);
             eh->ether_type = htons(ETHER_TYPE);
             tx_len += sizeof(struct ether_header);
-
-            /* Packet data */
-//	sendbuf[tx_len++] = 0x62;
-//	sendbuf[tx_len++] = 0x61;
-//	sendbuf[tx_len++] = 0x74;
-//	sendbuf[tx_len++] = 0x61;
-//	sendbuf[tx_len++] = 0x74;
-//	sendbuf[tx_len++] = 0x61;
 
             /* Index of the network device */
             socket_address.sll_ifindex = if_idx.ifr_ifindex;
@@ -230,31 +220,22 @@ int main(int argc, char *argv[]) {
             socket_address.sll_addr[5] = m5a;
 
             char message[MAXCHAR];
-            //	int fd = 0;
             printf("Send a message: ");
             printf("\n");
             fgets(message, 100, stdin);
-            //send(fd, message, strlen(message), 0);
 
             unsigned int i;
 
             for (i = 0; i < strlen(message); i++) {
                 sendbuf[tx_len++] = message[i];
-                //printf("%x ", message[i]);
             }
-//	if (sendto(sockfd, message, tx_len, 0, (struct sockaddr*)&socket_address, sizeof(struct sockaddr_ll)) < 0)
-//	    printf("Send failed\n");
-            //An extra breaking condition can be added here (to terminate the while loop)
-//	}
 
             /* Send packet */
             if (sendto(sockfd, sendbuf, tx_len, 0, (struct sockaddr *) &socket_address, sizeof(struct sockaddr_ll)) < 0)
                 printf("Send failed\n");
 
-
             /* receive message*/
             numbytes = recvfrom(sockfd2, buf, MAXCHAR, 0, NULL, NULL);
-            //ret = ntohs(udph->len) - sizeof(struct udphdr);
 
             /* Print packet */
             printf("\nReceived Message: ");
@@ -265,4 +246,3 @@ int main(int argc, char *argv[]) {
         }
     }
 }
-
