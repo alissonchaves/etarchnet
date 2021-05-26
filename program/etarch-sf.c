@@ -1,4 +1,3 @@
-#include <arpa/inet.h>
 #include <linux/if_packet.h>
 #include <stdio.h>
 #include <string.h>
@@ -19,7 +18,7 @@
 //0,1,2..,9,A,B,C,D,E,F
 
 int getNum(char ch) {
-    int num = 0;
+    int num;
     if (ch >= '0' && ch <= '9') {
         num = ch - 0x30;
     } else {
@@ -61,7 +60,7 @@ int getNum(char ch) {
 //hexValue - which is in string format
 
 unsigned int hex2int(char hex[]) {
-    unsigned int x = 0;
+    unsigned int x;
     x = (getNum(hex[0])) * 16 + (getNum(hex[1]));
     return x;
 //    printf("%s", x);
@@ -121,12 +120,12 @@ int main(int argc, char *argv[]) {
         sprintf(m4, "%.2s", &crc[8]);
         sprintf(m5, "%.2s", &crc[10]);
 
-        unsigned int m0a = 0; //can be stored in unsigned char
-        unsigned int m1a = 0; //can be stored in unsigned char
-        unsigned int m2a = 0; //can be stored in unsigned char
-        unsigned int m3a = 0; //can be stored in unsigned char
-        unsigned int m4a = 0; //can be stored in unsigned char
-        unsigned int m5a = 0; //can be stored in unsigned char
+        unsigned int m0a; //can be stored in unsigned char
+        unsigned int m1a; //can be stored in unsigned char
+        unsigned int m2a; //can be stored in unsigned char
+        unsigned int m3a; //can be stored in unsigned char
+        unsigned int m4a; //can be stored in unsigned char
+        unsigned int m5a; //can be stored in unsigned char
 
         m0a = hex2int(m0);
         m1a = hex2int(m1);
@@ -140,7 +139,7 @@ int main(int argc, char *argv[]) {
         int sockopt;
         struct ifreq if_idx;
         struct ifreq if_mac;
-        int tx_len = 0;
+        int tx_len;
         char *sendbuf = malloc(MAXALLOC);
 
 /* Header structures */
@@ -191,9 +190,9 @@ int main(int argc, char *argv[]) {
 //	while(1) {
         char *message = malloc(MAXALLOC);
         // Arquivo - Begin
-        char *sndbuf = malloc(MAXALLOC);
+        char *sndbuf;
         FILE *fp2;
-        size_t size = 0;
+        size_t size;
 
         char openfile[MAXCHAR];
         strcpy(openfile, argv[2]);
