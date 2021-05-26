@@ -43,23 +43,23 @@
  * bit patterns which are used in the XOR operations in the program.
  */
 
-void init_crc32_tab( void ) {
+void init_crc32_tab(void) {
 
-	uint32_t i;
-	uint32_t j;
-	uint32_t crc;
+    uint32_t i;
+    uint32_t j;
+    uint32_t crc;
 
-	for (i=0; i<256; i++) {
+    for (i = 0; i < 256; i++) {
 
-		crc = i;
+        crc = i;
 
-		for (j=0; j<8; j++) {
+        for (j = 0; j < 8; j++) {
 
-			if ( crc & 0x00000001L ) crc = ( crc >> 1 ) ^ CRC_POLY_32;
-			else                     crc =   crc >> 1;
-		}
+            if (crc & 0x00000001L) crc = (crc >> 1) ^ CRC_POLY_32;
+            else crc = crc >> 1;
+        }
 
-		crc_tab_precalc[i] = crc;
-	}
+        crc_tab_precalc[i] = crc;
+    }
 
 }  /* init_crc32_tab */

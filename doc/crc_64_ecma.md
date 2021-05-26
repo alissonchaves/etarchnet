@@ -17,7 +17,9 @@
 
 ### Description
 
-The function `crc_64_ecma()` calculates a 64 bit CRC value of an input byte buffer based on the 64 bit CRC calculation algorithm defined by the ECMA in standard ECMA-182. The buffer length is provided as a parameter and the resulting CRC is returned as a return value by the function. The size of the buffer is limited to `SIZE_MAX`.
+The function `crc_64_ecma()` calculates a 64 bit CRC value of an input byte buffer based on the 64 bit CRC calculation
+algorithm defined by the ECMA in standard ECMA-182. The buffer length is provided as a parameter and the resulting CRC
+is returned as a return value by the function. The size of the buffer is limited to `SIZE_MAX`.
 
 ### See Also
 
